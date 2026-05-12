@@ -38,3 +38,7 @@ build/
 .DS_Store
 /.idea/
 /.gigaide/
+/d_hub_company_service/.gigaide/
+/eureka_server/.gigaide/
+/gateway_routes/.gigaide/
+/gateway_routes/.gigaide/

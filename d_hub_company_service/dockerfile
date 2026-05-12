@@ -1,0 +1,7 @@
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+COPY ./target/d_hub_company_service-0.0.1-SNAPSHOT.jar /app/d_hub_company_service.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

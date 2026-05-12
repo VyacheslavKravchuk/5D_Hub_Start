@@ -1,0 +1,80 @@
+services:
+  eureka_server:
+    build: ./eureka_server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - my-network
+    restart: always
+
+  d_hub_user_service:
+    build: ./d_hub_user_service
+    container_name: d_hub_user_service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka_server
+      - postgres
+    networks:
+      - my-network
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: klerik87&
+    restart: always
+
+  d_hub_company_service:
+    build: ./d_hub_company_service
+    container_name: d_hub_company_service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - eureka_server
+      - postgres
+    networks:
+      - my-network
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: klerik87&
+    restart: always
+
+  gateway_routes:
+    build: ./gateway_routes
+    container_name: gateway_routes
+    ports:
+      - "8083:8083"
+    depends_on:
+      - eureka_server
+      - d_hub_user_service
+      - d_hub_company_service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+    networks:
+      - my-network
+    restart: always
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: klerik87&
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my-network
+    restart: always
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
